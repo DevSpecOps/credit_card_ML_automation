@@ -16,3 +16,17 @@ notebooks 01_eda.ipynb
 
 ## Status
 Sprint 1: data layer (download, validation, feature engineering).
+## Sprint 3: serving, prediction logging, drift monitoring
+
+- FastAPI service with `/health` and `/predict` (Dockerized).
+- Predictions logged to `monitoring.db` (SQLite, git-ignored).
+- Traffic simulator: `python -m src.monitoring.simulate_traffic 100`.
+- Drift report vs training distribution: `python -m src.monitoring.report` (alerts to `artifacts/drift_alerts.log` when PSI >= 0.25).
+- Model registered in MLflow Model Registry as `credit_card_default_model`.
+
+Reproduce:
+
+    dvc repro
+    docker compose up -d
+    python -m src.monitoring.simulate_traffic 100
+    python -m src.monitoring.report

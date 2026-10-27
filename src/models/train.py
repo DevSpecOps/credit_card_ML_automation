@@ -14,6 +14,8 @@ from src import config
 from src.features.build_features import engineer_features
 from src.models.pipeline import build_pipeline
 
+REGISTERED_MODEL_NAME = "credit_card_default_model"
+
 
 def load_params() -> dict:
     path = config.PROJECT_ROOT / "params.yaml"
@@ -73,6 +75,7 @@ def train() -> None:
         mlflow.sklearn.log_model(
             best,
             name="model",
+            registered_model_name=REGISTERED_MODEL_NAME,
             skops_trusted_types=["numpy.dtype", "sklearn.tree._tree.Tree"],
         )
 

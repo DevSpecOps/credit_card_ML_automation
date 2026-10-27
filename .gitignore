@@ -35,3 +35,6 @@ dist/
 mlflow.db
 models/*.pkl
 artifacts/*.json
+
+monitoring.db
+artifacts/drift_alerts.log

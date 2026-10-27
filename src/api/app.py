@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from src import config
+from src.api.storage import log_prediction
 from src.features.build_features import engineer_features
 
 app = FastAPI(title="credit_card_default")
@@ -60,4 +61,5 @@ def predict(client: ClientData) -> dict:
     df = engineer_features(df)
     model = get_model()
     proba = float(model.predict_proba(df)[:, 1][0])
+    log_prediction(data, proba, int(proba >= 0.5))
     return {"default_prediction": int(proba >= 0.5), "default_probability": proba}
