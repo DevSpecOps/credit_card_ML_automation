@@ -1,0 +1,83 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python -m src.data.make_dataset data/raw/UCI_Credit_Card.csv 
+      data/processed/
+    deps:
+    - path: data/raw/UCI_Credit_Card.csv
+      hash: md5
+      md5: 940b416bb13a9b24bb5c9e1589284005
+      size: 2862995
+    - path: src/data/make_dataset.py
+      hash: md5
+      md5: c3f0992e93c0ddc70a5bc26dc9ccd52a
+      size: 1259
+    - path: src/data/validation.py
+      hash: md5
+      md5: f4e0ecb10be6a0a27a9c43e05ed48eaa
+      size: 1482
+    - path: src/features/build_features.py
+      hash: md5
+      md5: 318c5794ab6f019ed9268425ad29631e
+      size: 894
+    params:
+      params.yaml:
+        prepare.random_state: 42
+        prepare.test_size: 0.2
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 5a79729cd43fa3d6067de0f9fa9001d8
+      size: 1226709
+    - path: data/processed/train.csv
+      hash: md5
+      md5: e6bdf41e10b0b6d849771f756bb56ac4
+      size: 4908288
+  train:
+    cmd: python -m src.models.train
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 5a79729cd43fa3d6067de0f9fa9001d8
+      size: 1226709
+    - path: data/processed/train.csv
+      hash: md5
+      md5: e6bdf41e10b0b6d849771f756bb56ac4
+      size: 4908288
+    - path: src/features/build_features.py
+      hash: md5
+      md5: 318c5794ab6f019ed9268425ad29631e
+      size: 894
+    - path: src/models/pipeline.py
+      hash: md5
+      md5: 1a63cf9236b326d9c3348b3c1454da6a
+      size: 1134
+    - path: src/models/train.py
+      hash: md5
+      md5: f25c498bbf6858ef1d7e2cc63d953b32
+      size: 2736
+    params:
+      params.yaml:
+        train.cv: 3
+        train.learning_rate:
+        - 0.05
+        - 0.1
+        - 0.2
+        train.max_depth:
+        - 3
+        - 5
+        - 7
+        train.n_estimators:
+        - 100
+        - 200
+        - 300
+        train.scoring: roc_auc
+    outs:
+    - path: artifacts/metrics.json
+      hash: md5
+      md5: bccbe538bcd3c72064f7f7c87d0d517d
+      size: 185
+    - path: models/model.pkl
+      hash: md5
+      md5: e89c73c9844524494d41ac0b657afdb0
+      size: 272077

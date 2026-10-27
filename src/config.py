@@ -1,10 +1,17 @@
-﻿from pathlib import Path
+from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_RAW = PROJECT_ROOT / "data" / "raw" / "UCI_Credit_Card.csv"
 DATA_PROCESSED = PROJECT_ROOT / "data" / "processed"
 MODELS_DIR = PROJECT_ROOT / "models"
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
+
+TRAIN_PATH = DATA_PROCESSED / "train.csv"
+TEST_PATH = DATA_PROCESSED / "test.csv"
+MODEL_PATH = MODELS_DIR / "model.pkl"
+
+MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+EXPERIMENT_NAME = "credit_card_default"
 
 TARGET = "default_payment_next_month"
 

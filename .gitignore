@@ -31,3 +31,7 @@ htmlcov/
 *.egg-info/
 build/
 dist/
+
+mlflow.db
+models/*.pkl
+artifacts/*.json
