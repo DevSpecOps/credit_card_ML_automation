@@ -1,29 +1,39 @@
-﻿import sys
 import urllib.request
 from pathlib import Path
 
-MIRRORS = [
-    "https://raw.githubusercontent.com/selva86/datasets/master/UCI_Credit_Card.csv",
-    "https://raw.githubusercontent.com/dennislwm/UCI_Credit_Card/master/UCI_Credit_Card.csv",
-]
+import pandas as pd
+
+from src import config
+
+UCI_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/00350/default%20of%20credit%20card%20clients.xls"
 
 
-def download(dest: Path) -> None:
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    for url in MIRRORS:
-        try:
-            urllib.request.urlretrieve(url, dest)
-            print(f"downloaded {url} -> {dest}")
-            return
-        except Exception as exc:
-            print(f"mirror failed: {url}: {exc}")
-    sys.exit("all mirrors failed")
+def download_dataset() -> None:
+    if config.DATA_RAW.exists():
+        print(f"Dataset already exists at {config.DATA_RAW}")
+        return
 
+    config.DATA_RAW.parent.mkdir(parents=True, exist_ok=True)
+    temp_xls = config.DATA_RAW.with_suffix(".xls")
 
-def main() -> None:
-    dest = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("data/raw/UCI_Credit_Card.csv")
-    download(dest)
+    print("Downloading original XLS from UCI...")
+    try:
+        urllib.request.urlretrieve(UCI_URL, temp_xls)
+        print("XLS downloaded. Converting to CSV...")
+        
+        # header=1 пропускает первую строку с ID
+        df = pd.read_excel(temp_xls, header=1)
+        df = df.rename(columns={"default payment next month": "default.payment.next.month"})
+        df.to_csv(config.DATA_RAW, index=False)
+        
+        temp_xls.unlink()
+        print(f"Dataset saved to {config.DATA_RAW}")
+    except Exception as e:
+        print(f"Failed to download or convert dataset: {e}")
+        if temp_xls.exists():
+            temp_xls.unlink()
+        raise RuntimeError("Dataset download failed.") from e
 
 
 if __name__ == "__main__":
-    main()
+    download_dataset()

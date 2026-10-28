@@ -1,4 +1,10 @@
 stages:
+  download:
+    cmd: python -m src.data.download
+    deps:
+    - src/data/download.py
+    outs:
+    - data/raw/UCI_Credit_Card.csv
   prepare:
     cmd: python -m src.data.make_dataset data/raw/UCI_Credit_Card.csv 
       data/processed/

@@ -38,3 +38,6 @@ artifacts/*.json
 
 monitoring.db
 artifacts/drift_alerts.log
+
+.dvc/tmp/
+.dvc/cache/

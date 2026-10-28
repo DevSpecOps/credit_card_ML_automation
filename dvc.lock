@@ -1,13 +1,25 @@
 schema: '2.0'
 stages:
+  download:
+    cmd: python -m src.data.download
+    deps:
+    - path: src/data/download.py
+      hash: md5
+      md5: 9f968a9efd9a358badd91c96777f5cfb
+      size: 1257
+    outs:
+    - path: data/raw/UCI_Credit_Card.csv
+      hash: md5
+      md5: cd0e988e3cc6c027538f8306e4a37c63
+      size: 2897209
   prepare:
     cmd: python -m src.data.make_dataset data/raw/UCI_Credit_Card.csv 
       data/processed/
     deps:
     - path: data/raw/UCI_Credit_Card.csv
       hash: md5
-      md5: 940b416bb13a9b24bb5c9e1589284005
-      size: 2862995
+      md5: cd0e988e3cc6c027538f8306e4a37c63
+      size: 2897209
     - path: src/data/make_dataset.py
       hash: md5
       md5: c3f0992e93c0ddc70a5bc26dc9ccd52a
@@ -27,23 +39,23 @@ stages:
     outs:
     - path: data/processed/test.csv
       hash: md5
-      md5: 5a79729cd43fa3d6067de0f9fa9001d8
-      size: 1226709
+      md5: 1e54435770424c64d3bc84b098183c47
+      size: 1046709
     - path: data/processed/train.csv
       hash: md5
-      md5: e6bdf41e10b0b6d849771f756bb56ac4
-      size: 4908288
+      md5: e0631229e1eb643d7d561aa5bd53ec73
+      size: 4188288
   train:
     cmd: python -m src.models.train
     deps:
     - path: data/processed/test.csv
       hash: md5
-      md5: 5a79729cd43fa3d6067de0f9fa9001d8
-      size: 1226709
+      md5: 1e54435770424c64d3bc84b098183c47
+      size: 1046709
     - path: data/processed/train.csv
       hash: md5
-      md5: e6bdf41e10b0b6d849771f756bb56ac4
-      size: 4908288
+      md5: e0631229e1eb643d7d561aa5bd53ec73
+      size: 4188288
     - path: src/features/build_features.py
       hash: md5
       md5: 318c5794ab6f019ed9268425ad29631e
@@ -54,24 +66,30 @@ stages:
       size: 1134
     - path: src/models/train.py
       hash: md5
-      md5: 459560c416bcf083ee4b4dc25ffc0a55
-      size: 2846
+      md5: bb098403ce9424ef2d8b9e7192caf297
+      size: 4275
     params:
       params.yaml:
         train.cv: 3
         train.learning_rate:
+        - 0.05
         - 0.1
+        - 0.2
         train.max_depth:
+        - 3
+        - 5
         - 7
         train.n_estimators:
+        - 100
+        - 200
         - 300
         train.scoring: roc_auc
     outs:
     - path: artifacts/metrics.json
       hash: md5
-      md5: ad14b13d3ce0d1bffafba9722e62229d
-      size: 183
+      md5: c4872906663be5e95c0b3d48600880dd
+      size: 185
     - path: models/model.pkl
       hash: md5
-      md5: 2576441dcac54f2c091160c8b356af46
-      size: 3723791
+      md5: e89c73c9844524494d41ac0b657afdb0
+      size: 272077
