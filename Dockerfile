@@ -2,8 +2,10 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY requirements.txt requirements.api.txt ./
-RUN pip install --no-cache-dir -r requirements.txt -r requirements.api.txt
+ENV PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple
+
+COPY requirements.api.txt ./
+RUN pip install --no-cache-dir -r requirements.api.txt
 
 COPY src ./src
 
