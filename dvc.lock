@@ -54,30 +54,24 @@ stages:
       size: 1134
     - path: src/models/train.py
       hash: md5
-      md5: f25c498bbf6858ef1d7e2cc63d953b32
-      size: 2736
+      md5: 459560c416bcf083ee4b4dc25ffc0a55
+      size: 2846
     params:
       params.yaml:
         train.cv: 3
         train.learning_rate:
-        - 0.05
         - 0.1
-        - 0.2
         train.max_depth:
-        - 3
-        - 5
         - 7
         train.n_estimators:
-        - 100
-        - 200
         - 300
         train.scoring: roc_auc
     outs:
     - path: artifacts/metrics.json
       hash: md5
-      md5: bccbe538bcd3c72064f7f7c87d0d517d
-      size: 185
+      md5: ad14b13d3ce0d1bffafba9722e62229d
+      size: 183
     - path: models/model.pkl
       hash: md5
-      md5: e89c73c9844524494d41ac0b657afdb0
-      size: 272077
+      md5: 2576441dcac54f2c091160c8b356af46
+      size: 3723791
