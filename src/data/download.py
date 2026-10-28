@@ -20,12 +20,12 @@ def download_dataset() -> None:
     try:
         urllib.request.urlretrieve(UCI_URL, temp_xls)
         print("XLS downloaded. Converting to CSV...")
-        
+
         # header=1 пропускает первую строку с ID
         df = pd.read_excel(temp_xls, header=1)
         df = df.rename(columns={"default payment next month": "default.payment.next.month"})
         df.to_csv(config.DATA_RAW, index=False)
-        
+
         temp_xls.unlink()
         print(f"Dataset saved to {config.DATA_RAW}")
     except Exception as e:
