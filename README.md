@@ -50,6 +50,8 @@ flowchart LR
 
 ## Быстрый старт
 
+> **Примечание:** Файл `requirements.api.txt` содержит только легковесные зависимости для запуска API внутри Docker (FastAPI, Uvicorn). Локально для обучения и тестов достаточно установить основной `requirements.txt`.
+
 ### 1. Подготовка окружения
 ```bash
 python -m venv venv
@@ -57,7 +59,6 @@ python -m venv venv
 # Linux/Mac: source venv/bin/activate
 
 pip install -r requirements.txt
-pip install -r requirements.api.txt
 ```
 
 ### 2. Воспроизведение пайплайна (DVC)
