@@ -1,32 +1,98 @@
-# Credit Default PD - MLOps Pipeline
+# Credit Card Default Prediction (MLOps Pipeline)
 
-End-to-end MLOps pipeline for a Probability-of-Default model on the UCI Credit Card Default dataset.
+![CI](https://github.com/DevSpecOps/credit_card_ML_automation/actions/workflows/ci.yml/badge.svg)
+![CD](https://github.com/DevSpecOps/credit_card_ML_automation/actions/workflows/cd.yml/badge.svg)
 
-## Stack
-Python 3.10, scikit-learn, Pandera, Great Expectations, MLflow, DVC, FastAPI, Docker, GitHub Actions, pytest, flake8, black.
+## О проекте
 
-## Structure
-src/data data loading and validation
-src/features feature engineering
-src/models sklearn pipeline and training
-src/api FastAPI app
-src/monitoring PSI drift and traffic simulator
-tests unit and integration tests
-notebooks 01_eda.ipynb
+Автоматизированный MLOps-пайплайн для предсказания дефолта по кредитным картам (PD-модель).
+Проект демонстрирует полный жизненный цикл ML-модели: от валидации данных и инженерии признаков до контейнеризации, мониторинга дрейфа и автоматического переобучения.
 
-## Status
-Sprint 1: data layer (download, validation, feature engineering).
-## Sprint 3: serving, prediction logging, drift monitoring
+## Архитектура
 
-- FastAPI service with `/health` and `/predict` (Dockerized).
-- Predictions logged to `monitoring.db` (SQLite, git-ignored).
-- Traffic simulator: `python -m src.monitoring.simulate_traffic 100`.
-- Drift report vs training distribution: `python -m src.monitoring.report` (alerts to `artifacts/drift_alerts.log` when PSI >= 0.25).
-- Model registered in MLflow Model Registry as `credit_card_default_model`.
+```mermaid
+flowchart LR
+    A[data/raw] -->|dvc download| B[data/processed]
+    B -->|dvc prepare| C[features]
+    C -->|dvc train| D[models/model.pkl]
+    D -->|Docker volume| E[FastAPI service]
+    E -->|log| F[(monitoring.db)]
+    F -->|PSI + Evidently| G[drift alerts]
+    G -->|threshold 0.25| H[retrain trigger]
+    H -->|dvc repro| D
+    D -.->|register| I[MLflow Registry]
+```
 
-Reproduce:
+## Технологический стек
 
-    dvc repro
-    docker compose up -d
-    python -m src.monitoring.simulate_traffic 100
-    python -m src.monitoring.report
+- **Данные и признаки:** Pandas, Pandera (валидация), Scikit-learn (Pipeline)
+- **Трекинг и версии:** MLflow (Tracking + Registry), DVC (Data Version Control)
+- **Сервинг:** FastAPI, Uvicorn, Docker, Docker Compose
+- **Мониторинг:** Evidently AI, PSI (Population Stability Index)
+- **CI/CD:** GitHub Actions, GHCR (GitHub Container Registry)
+- **Качество кода:** Pytest, Flake8, Black
+
+## Структура проекта
+
+```text
+├── .github/workflows/   # CI/CD пайплайны
+├── data/                # raw (gitignored) и processed данные
+├── docs/                # Архитектура и Runbook
+├── models/              # Обученные модели (gitignored)
+├── notebooks/           # EDA (01_eda.ipynb)
+├── scripts/             # Вспомогательные скрипты (run_docker.ps1, run_experiments.ps1)
+├── src/                 # Исходный код (data, features, models, api, monitoring)
+├── tests/               # Unit-тесты
+├── dvc.yaml             # DVC пайплайн
+├── params.yaml          # Гиперпараметры
+└── requirements.txt     # Зависимости
+```
+
+## Быстрый старт
+
+### 1. Подготовка окружения
+```bash
+python -m venv venv
+# Windows: .\venv\Scripts\activate
+# Linux/Mac: source venv/bin/activate
+
+pip install -r requirements.txt
+pip install -r requirements.api.txt
+```
+
+### 2. Воспроизведение пайплайна (DVC)
+Скрипт сам скачает данные с UCI, подготовит фичи и обучит модель:
+```bash
+dvc repro
+```
+
+### 3. Эксперименты (MLflow)
+```bash
+mlflow ui --backend-store-uri sqlite:///mlflow.db
+# Откройте http://127.0.0.1:5000
+```
+
+### 4. Запуск API (Docker)
+```powershell
+.\scripts\run_docker.ps1
+```
+API будет доступно по адресу `http://127.0.0.1:8000/health`.
+Документация Swagger: `http://127.0.0.1:8000/docs`.
+
+## Тестирование и CI
+```bash
+black src tests
+flake8 src tests
+pytest tests/ -v
+```
+
+## Мониторинг и дрейф
+```bash
+python -m src.monitoring.simulate_traffic 100
+python -m src.monitoring.report
+python -m src.monitoring.evidently_report
+```
+Отчет Evidently сохраняется в `artifacts/drift_report.html`.
+
+## Лицензия
+Этот проект лицензирован под MIT License — см. файл [LICENSE](LICENSE).
