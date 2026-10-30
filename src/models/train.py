@@ -113,7 +113,11 @@ def train() -> None:
             best,
             name="model",
             registered_model_name=REGISTERED_MODEL_NAME,
-            skops_trusted_types=["numpy.dtype", "sklearn.tree._tree.Tree"],
+            skops_trusted_types=[
+                "numpy.dtype",
+                "sklearn.tree._tree.Tree",
+                "sklearn.compose._column_transformer._RemainderColsList",
+            ],
         )
 
         with open(Path(config.ARTIFACTS_DIR) / "metrics.json", "w", encoding="utf-8") as f:

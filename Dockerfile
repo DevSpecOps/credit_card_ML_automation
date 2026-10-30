@@ -1,4 +1,5 @@
-FROM python:3.10-slim
+ARG PYTHON_IMAGE=mirror.gcr.io/library/python:3.12-slim
+FROM ${PYTHON_IMAGE}
 
 WORKDIR /app
 
