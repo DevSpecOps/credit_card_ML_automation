@@ -38,11 +38,10 @@ def promote_latest(client: MlflowClient) -> str:
     if not versions:
         return "no versions"
     latest = max(versions, key=lambda v: int(v.version))
-    client.transition_model_version_stage(
-        REGISTERED_MODEL_NAME,
-        latest.version,
-        stage="Staging",
-        archive_existing_versions=False,
+    client.set_registered_model_alias(
+        name=REGISTERED_MODEL_NAME,
+        alias="staging",
+        version=latest.version,
     )
     return latest.version
 
@@ -59,7 +58,7 @@ def run(dry_run: bool = False) -> dict:
         client = MlflowClient(config.MLFLOW_TRACKING_URI)
         version = promote_latest(client)
         report["new_version"] = version
-        print(f"new Staging version: {version}")
+        print(f"new alias 'staging' set for version: {version}")
     elif not triggered:
         print("no retrain needed (no alerts above threshold)")
 
