@@ -12,6 +12,7 @@ if not config.DATA_RAW.exists():
 @pytest.fixture
 def raw_df():
     data = {
+        "ID": [1, 2, 3, 4],  # Добавили ID, который ждет Pandera
         "LIMIT_BAL": [50000, 100000, 30000, 120000],
         "AGE": [30, 45, 22, 51],
         "SEX": [1, 2, 1, 2],
