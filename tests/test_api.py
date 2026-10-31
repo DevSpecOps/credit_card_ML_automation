@@ -1,4 +1,8 @@
+from unittest.mock import MagicMock, patch
+
+import numpy as np
 from fastapi.testclient import TestClient
+
 from src.api.app import app
 
 client = TestClient(app)
@@ -36,16 +40,25 @@ def test_health():
     assert response.json() == {"status": "ok"}
 
 
-def test_predict_valid():
+@patch("src.api.app.get_model")
+def test_predict_valid(mock_get_model):
+    # Создаем фейковую модель, которая всегда выдает вероятность 0.2
+    mock_model = MagicMock()
+    mock_model.predict_proba.return_value = np.array([[0.8, 0.2]])
+    mock_get_model.return_value = mock_model
+
     response = client.post("/predict", json=VALID_PAYLOAD)
+
     assert response.status_code == 200
     data = response.json()
     assert "default_prediction" in data
     assert "default_probability" in data
+    assert data["default_prediction"] == 0
+    assert data["default_probability"] == 0.2
 
 
 def test_predict_invalid_age():
     bad_payload = VALID_PAYLOAD.copy()
-    bad_payload["AGE"] = 150
+    bad_payload["AGE"] = 150  # Больше 100 (Pydantic должен отклонить)
     response = client.post("/predict", json=bad_payload)
-    assert response.status_code == 422  # Unprocessable Entity (Pydantic validation)
+    assert response.status_code == 422  # Unprocessable Entity
