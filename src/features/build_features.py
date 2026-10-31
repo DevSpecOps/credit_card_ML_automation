@@ -1,4 +1,4 @@
-﻿import numpy as np
+import numpy as np
 import pandas as pd
 
 from src.config import BILL_COLS, DELAY_COLS, PAY_COLS

@@ -42,7 +42,6 @@ def test_health():
 
 @patch("src.api.app.get_model")
 def test_predict_valid(mock_get_model):
-    # Создаем фейковую модель, которая всегда выдает вероятность 0.2
     mock_model = MagicMock()
     mock_model.predict_proba.return_value = np.array([[0.8, 0.2]])
     mock_get_model.return_value = mock_model
@@ -59,6 +58,6 @@ def test_predict_valid(mock_get_model):
 
 def test_predict_invalid_age():
     bad_payload = VALID_PAYLOAD.copy()
-    bad_payload["AGE"] = 150  # Больше 100 (Pydantic должен отклонить)
+    bad_payload["AGE"] = 150
     response = client.post("/predict", json=bad_payload)
-    assert response.status_code == 422  # Unprocessable Entity
+    assert response.status_code == 422
