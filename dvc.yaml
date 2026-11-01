@@ -25,6 +25,7 @@ stages:
     - data/processed/test.csv
     - data/processed/train.csv
     - src/features/build_features.py
+    - src/models/metrics.py
     - src/models/pipeline.py
     - src/models/train.py
     params:
@@ -34,5 +35,9 @@ stages:
     - train.n_estimators
     - train.scoring
     outs:
-    - artifacts/metrics.json
     - models/model.pkl
+    metrics:
+    - artifacts/metrics.json
+    plots:
+    - artifacts/roc_curve.png:
+        cache: false

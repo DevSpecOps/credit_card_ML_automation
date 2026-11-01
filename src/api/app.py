@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import joblib
@@ -26,9 +27,9 @@ def get_model():
 class ClientData(BaseModel):
     LIMIT_BAL: float = Field(..., ge=0)
     AGE: int = Field(..., ge=18, le=120)
-    SEX: int
-    EDUCATION: int
-    MARRIAGE: int
+    SEX: int = Field(..., ge=1, le=2)
+    EDUCATION: int = Field(..., ge=1, le=4)
+    MARRIAGE: int = Field(..., ge=1, le=3)
     PAY_0: int
     PAY_2: int
     PAY_3: int
@@ -61,5 +62,8 @@ def predict(client: ClientData) -> dict:
     df = engineer_features(df)
     model = get_model()
     proba = float(model.predict_proba(df)[:, 1][0])
-    log_prediction(data, proba, int(proba >= 0.5))
+    try:
+        log_prediction(data, proba, int(proba >= 0.5))
+    except Exception:
+        logging.getLogger(__name__).exception("prediction logging failed")
     return {"default_prediction": int(proba >= 0.5), "default_probability": proba}

@@ -41,3 +41,5 @@ artifacts/drift_alerts.log
 
 .dvc/tmp/
 .dvc/cache/
+
+monitoring_data/

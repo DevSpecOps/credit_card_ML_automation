@@ -27,5 +27,5 @@
 
 ## Inspect experiments
 
-    mlflow ui --backend-store-uri sqlite:///mlflow.db
+    mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5001 --port 5001
     dvc exp show --no-pager

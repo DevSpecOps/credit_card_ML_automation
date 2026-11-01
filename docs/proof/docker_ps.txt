@@ -1,0 +1,2 @@
+NAME                              IMAGE                           COMMAND                  SERVICE   CREATED         STATUS         PORTS
+credit_card_ml_automation-api-1   credit_card_ml_automation-api   "uvicorn src.api.app…"   api       6 seconds ago   Up 5 seconds   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp

@@ -10,7 +10,7 @@ TRAIN_PATH = DATA_PROCESSED / "train.csv"
 TEST_PATH = DATA_PROCESSED / "test.csv"
 MODEL_PATH = MODELS_DIR / "model.pkl"
 
-MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+MLFLOW_TRACKING_URI = f"sqlite:///{(PROJECT_ROOT / 'mlflow.db').as_posix()}"
 EXPERIMENT_NAME = "credit_card_default"
 
 TARGET = "default_payment_next_month"

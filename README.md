@@ -37,10 +37,10 @@ flowchart LR
 ```text
 ├── .github/workflows/   # CI/CD пайплайны
 ├── data/                # raw (gitignored) и processed данные
-├── docs/                # Архитектура и Runbook
+├── docs/                # Архитектура, Runbook и Proofs
 ├── models/              # Обученные модели (gitignored)
 ├── notebooks/           # EDA (01_eda.ipynb)
-├── scripts/             # Вспомогательные скрипты (run_docker.ps1, run_experiments.ps1)
+├── scripts/             # Скрипты автоматизации
 ├── src/                 # Исходный код (data, features, models, api, monitoring)
 ├── tests/               # Unit-тесты
 ├── dvc.yaml             # DVC пайплайн
@@ -50,19 +50,19 @@ flowchart LR
 
 ## Быстрый старт
 
-> **Примечание:** Файл `requirements.api.txt` содержит только легковесные зависимости для запуска API внутри Docker (FastAPI, Uvicorn). Локально для обучения и тестов достаточно установить основной `requirements.txt`.
-
 ### 1. Подготовка окружения
-```bash
 
-# Windows
+**Windows:**
+```powershell
 python -m venv venv
 .\venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-# Linux / macOS
+**macOS / Linux:**
+```bash
 python3 -m venv venv
 source venv/bin/activate
-
 pip install -r requirements.txt
 ```
 
@@ -74,14 +74,23 @@ dvc repro
 
 ### 3. Эксперименты (MLflow)
 ```bash
-mlflow ui --backend-store-uri sqlite:///mlflow.db
-# Откройте http://127.0.0.1:5000
+mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5001
 ```
+Откройте `http://127.0.0.1:5001`.
 
 ### 4. Запуск API (Docker)
+
+**Windows:**
 ```powershell
 .\scripts\run_docker.ps1
 ```
+
+**macOS / Linux:**
+```bash
+chmod +x scripts/run_docker.sh
+./scripts/run_docker.sh
+```
+
 API будет доступно по адресу `http://127.0.0.1:8000/health`.
 Документация Swagger: `http://127.0.0.1:8000/docs`.
 

@@ -1,14 +1,22 @@
 import json
+import os
 import sqlite3
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
 from src import config
 
-DB_PATH = Path(config.PROJECT_ROOT) / "monitoring.db"
+DB_PATH = Path(
+    os.environ.get(
+        "MONITORING_DB_PATH",
+        config.PROJECT_ROOT / "monitoring_data" / "monitoring.db",
+    )
+)
 
 
 def _connect():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS predictions (
@@ -23,7 +31,7 @@ def _connect():
 
 
 def log_prediction(features: dict, probability: float, prediction: int) -> None:
-    with _connect() as conn:
+    with closing(_connect()) as conn, conn:
         conn.execute(
             "INSERT INTO predictions (ts, features, probability, prediction) VALUES (?, ?, ?, ?)",
             (
@@ -36,9 +44,8 @@ def log_prediction(features: dict, probability: float, prediction: int) -> None:
 
 
 def fetch_predictions(limit: int = 1000):
-    with _connect() as conn:
-        rows = conn.execute(
+    with closing(_connect()) as conn:
+        return conn.execute(
             "SELECT ts, features, probability, prediction FROM predictions ORDER BY id DESC LIMIT ?",
             (limit,),
         ).fetchall()
-    return rows

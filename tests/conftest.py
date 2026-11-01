@@ -4,9 +4,12 @@ import pytest
 from src import config
 from src.features.build_features import engineer_features
 
-collect_ignore_glob = []
-if not config.DATA_RAW.exists():
-    collect_ignore_glob = ["*validation*.py", "*dataset*.py", "*integration*.py"]
+
+@pytest.fixture(autouse=True)
+def _isolated_monitoring_db(tmp_path, monkeypatch):
+    from src.api import storage
+
+    monkeypatch.setattr(storage, "DB_PATH", tmp_path / "monitoring.db")
 
 
 @pytest.fixture

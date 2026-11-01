@@ -15,6 +15,13 @@ def load_prepare_params() -> dict:
         return yaml.safe_load(f)["prepare"]
 
 
+def clean_raw(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df["EDUCATION"] = df["EDUCATION"].replace({0: 4, 5: 4, 6: 4})
+    df["MARRIAGE"] = df["MARRIAGE"].replace({0: 3})
+    return df
+
+
 def prepare(raw_path: Path, out_dir: Path) -> None:
     params = load_prepare_params()
 
@@ -25,6 +32,7 @@ def prepare(raw_path: Path, out_dir: Path) -> None:
     if "ID" in df.columns:
         df = df.drop(columns=["ID"])
 
+    df = clean_raw(df)
     df = engineer_features(df)
 
     train_df, test_df = train_test_split(

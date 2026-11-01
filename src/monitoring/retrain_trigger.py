@@ -36,29 +36,46 @@ def should_retrain(alerts: list, threshold: float = DRIFT_THRESHOLD) -> bool:
     return any(a["psi"] >= threshold for a in alerts)
 
 
-def promote_latest(client: MlflowClient) -> str:
+def get_metric(client: MlflowClient, version: str, metric_name: str = "roc_auc") -> float:
+    mv = client.get_model_version(REGISTERED_MODEL_NAME, version)
+    run = client.get_run(mv.run_id)
+    return float(run.data.metrics.get(metric_name, 0.0))
+
+
+def promote_if_better(client: MlflowClient) -> str:
     versions = client.search_model_versions(f"name='{REGISTERED_MODEL_NAME}'")
     if not versions:
         return "no versions"
+
     latest = max(versions, key=lambda v: int(v.version))
 
     max_retries = 15
-    retry_delay = 2
     for attempt in range(max_retries):
-
-        current_status = ModelVersionStatus.from_string(latest.status)
-        if current_status == ModelVersionStatus.READY:
+        if ModelVersionStatus.from_string(latest.status) == ModelVersionStatus.READY:
             break
-        print(
-            f"Waiting for model version {latest.version} to be READY... (attempt {attempt+1}/{max_retries})"
-        )
-        time.sleep(retry_delay)
+        print(f"Waiting for version {latest.version} to be READY... (attempt {attempt+1})")
+        time.sleep(2)
         latest = client.get_model_version(REGISTERED_MODEL_NAME, latest.version)
 
     if ModelVersionStatus.from_string(latest.status) != ModelVersionStatus.READY:
-        raise RuntimeError(
-            f"Model version {latest.version} is not ready after {max_retries * retry_delay}s (status: {latest.status})"
-        )
+        raise RuntimeError(f"Version {latest.version} failed to reach READY status.")
+
+    latest_metric = get_metric(client, latest.version)
+
+    try:
+        current_staging = client.get_model_version_by_alias(REGISTERED_MODEL_NAME, ALIAS_NAME)
+        if current_staging.version == latest.version:
+            return f"Version {latest.version} is already {ALIAS_NAME}"
+
+        staging_metric = get_metric(client, current_staging.version)
+        print(f"Challenger (v{latest.version}): ROC-AUC = {latest_metric:.4f}")
+        print(f"Champion   (v{current_staging.version}): ROC-AUC = {staging_metric:.4f}")
+
+        if latest_metric <= staging_metric:
+            print(f"Rejecting v{latest.version}: metric is not better than champion.")
+            return f"Version {latest.version} rejected (worse than {current_staging.version})"
+    except Exception:
+        print(f"No current {ALIAS_NAME} alias found. Promoting v{latest.version} by default.")
 
     client.set_registered_model_alias(
         name=REGISTERED_MODEL_NAME,
@@ -78,9 +95,9 @@ def run(dry_run: bool = False) -> dict:
         print("running:", " ".join(cmd))
         subprocess.run(cmd, check=True)
         client = MlflowClient(config.MLFLOW_TRACKING_URI)
-        version = promote_latest(client)
-        report["new_version"] = version
-        print(f"new alias '{ALIAS_NAME}' set for version: {version}")
+        version = promote_if_better(client)
+        report["promotion_result"] = version
+        print(f"Promotion result: {version}")
     elif not triggered:
         print("no retrain needed (no alerts above threshold)")
 

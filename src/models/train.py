@@ -9,17 +9,12 @@ import mlflow
 import mlflow.sklearn
 import pandas as pd
 import yaml
-from sklearn.metrics import (
-    RocCurveDisplay,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
+from sklearn.metrics import RocCurveDisplay
 from sklearn.model_selection import GridSearchCV
 
 from src import config
 from src.features.build_features import engineer_features
+from src.models.metrics import compute_metrics
 from src.models.pipeline import build_pipeline
 
 REGISTERED_MODEL_NAME = "credit_card_default_model"
@@ -85,13 +80,7 @@ def train() -> None:
 
         print("[5/6] Calculating metrics and logging to MLflow...", flush=True)
         y_proba = best.predict_proba(X_test)[:, 1]
-        y_pred = (y_proba >= 0.5).astype(int)
-        metrics = {
-            "roc_auc": float(roc_auc_score(y_test, y_proba)),
-            "f1": float(f1_score(y_test, y_pred)),
-            "precision": float(precision_score(y_test, y_pred)),
-            "recall": float(recall_score(y_test, y_pred)),
-        }
+        metrics = compute_metrics(y_test, y_proba)
         mlflow.log_metrics(metrics)
 
         Path(config.ARTIFACTS_DIR).mkdir(parents=True, exist_ok=True)

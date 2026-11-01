@@ -5,8 +5,8 @@ stages:
     deps:
     - path: src/data/download.py
       hash: md5
-      md5: 865a5a8f2a6cffa14ea213da9188664a
-      size: 1241
+      md5: 577ee83215dd7a0c1c5ae117fb022e19
+      size: 1168
     outs:
     - path: data/raw/UCI_Credit_Card.csv
       hash: md5
@@ -22,16 +22,16 @@ stages:
       size: 2897209
     - path: src/data/make_dataset.py
       hash: md5
-      md5: c3f0992e93c0ddc70a5bc26dc9ccd52a
-      size: 1259
+      md5: 3cd0f2395c68c27a267c009a06008b98
+      size: 1484
     - path: src/data/validation.py
       hash: md5
-      md5: f4e0ecb10be6a0a27a9c43e05ed48eaa
-      size: 1482
+      md5: 86196f2a26a72f24a26904ada5d3b582
+      size: 1478
     - path: src/features/build_features.py
       hash: md5
-      md5: 318c5794ab6f019ed9268425ad29631e
-      size: 894
+      md5: 43758fc914559368c0ab2176d34dd440
+      size: 891
     params:
       params.yaml:
         prepare.random_state: 42
@@ -39,35 +39,39 @@ stages:
     outs:
     - path: data/processed/test.csv
       hash: md5
-      md5: 1e54435770424c64d3bc84b098183c47
+      md5: 0d32994f6424cbb3d8178ada094f053b
       size: 1046709
     - path: data/processed/train.csv
       hash: md5
-      md5: e0631229e1eb643d7d561aa5bd53ec73
+      md5: 716555fa34f858f05f08993ee7572c33
       size: 4188288
   train:
     cmd: python -m src.models.train
     deps:
     - path: data/processed/test.csv
       hash: md5
-      md5: 1e54435770424c64d3bc84b098183c47
+      md5: 0d32994f6424cbb3d8178ada094f053b
       size: 1046709
     - path: data/processed/train.csv
       hash: md5
-      md5: e0631229e1eb643d7d561aa5bd53ec73
+      md5: 716555fa34f858f05f08993ee7572c33
       size: 4188288
     - path: src/features/build_features.py
       hash: md5
-      md5: 318c5794ab6f019ed9268425ad29631e
-      size: 894
+      md5: 43758fc914559368c0ab2176d34dd440
+      size: 891
+    - path: src/models/metrics.py
+      hash: md5
+      md5: eb176b92830dfee4d84c595f6212219a
+      size: 434
     - path: src/models/pipeline.py
       hash: md5
       md5: 1a63cf9236b326d9c3348b3c1454da6a
       size: 1134
     - path: src/models/train.py
       hash: md5
-      md5: 741cd5f7cacf6616fa785f4519adcc19
-      size: 4396
+      md5: 0b7924563af4618039e959dd73c6d0bc
+      size: 4100
     params:
       params.yaml:
         train.cv: 3
@@ -87,9 +91,13 @@ stages:
     outs:
     - path: artifacts/metrics.json
       hash: md5
-      md5: 52ef690c61a417a9525e916cc93b5dd9
+      md5: d676c891b41d483d4c504a8b8490b58c
       size: 184
+    - path: artifacts/roc_curve.png
+      hash: md5
+      md5: 5014a39479f9341ec3e4de15d85dcca8
+      size: 28692
     - path: models/model.pkl
       hash: md5
-      md5: 43e0418a898242d1600420fa43364816
-      size: 272490
+      md5: b61fab7fa7f5c54597998e8997a84e0a
+      size: 146730
