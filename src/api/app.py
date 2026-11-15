@@ -25,29 +25,29 @@ def get_model():
 
 
 class ClientData(BaseModel):
-    LIMIT_BAL: float = Field(..., ge=0)
-    AGE: int = Field(..., ge=18, le=120)
+    LIMIT_BAL: float = Field(..., gt=0, le=1_000_000)
+    AGE: int = Field(..., ge=18, le=100)
     SEX: int = Field(..., ge=1, le=2)
     EDUCATION: int = Field(..., ge=1, le=4)
     MARRIAGE: int = Field(..., ge=1, le=3)
-    PAY_0: int
-    PAY_2: int
-    PAY_3: int
-    PAY_4: int
-    PAY_5: int
-    PAY_6: int
+    PAY_0: int = Field(..., ge=-2, le=9)
+    PAY_2: int = Field(..., ge=-2, le=9)
+    PAY_3: int = Field(..., ge=-2, le=9)
+    PAY_4: int = Field(..., ge=-2, le=9)
+    PAY_5: int = Field(..., ge=-2, le=9)
+    PAY_6: int = Field(..., ge=-2, le=9)
     BILL_AMT1: float
     BILL_AMT2: float
     BILL_AMT3: float
     BILL_AMT4: float
     BILL_AMT5: float
     BILL_AMT6: float
-    PAY_AMT1: float
-    PAY_AMT2: float
-    PAY_AMT3: float
-    PAY_AMT4: float
-    PAY_AMT5: float
-    PAY_AMT6: float
+    PAY_AMT1: float = Field(..., ge=0)
+    PAY_AMT2: float = Field(..., ge=0)
+    PAY_AMT3: float = Field(..., ge=0)
+    PAY_AMT4: float = Field(..., ge=0)
+    PAY_AMT5: float = Field(..., ge=0)
+    PAY_AMT6: float = Field(..., ge=0)
 
 
 @app.get("/health")

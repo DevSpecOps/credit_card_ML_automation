@@ -5,6 +5,7 @@ import pandas as pd
 
 from src import config
 from src.api.storage import fetch_predictions
+from src.features.build_features import engineer_features
 
 
 def load_reference() -> pd.DataFrame:
@@ -16,7 +17,7 @@ def load_production(limit: int = 2000) -> pd.DataFrame:
     if not rows:
         return pd.DataFrame()
     features = [json.loads(r[1]) for r in rows]
-    return pd.DataFrame(features)
+    return engineer_features(pd.DataFrame(features))
 
 
 def run() -> None:

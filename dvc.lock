@@ -91,7 +91,7 @@ stages:
     outs:
     - path: artifacts/metrics.json
       hash: md5
-      md5: d676c891b41d483d4c504a8b8490b58c
+      md5: 7580cc02ece1ab4bc3bc1e15b8237f86
       size: 184
     - path: artifacts/roc_curve.png
       hash: md5

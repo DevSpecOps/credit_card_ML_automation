@@ -5,6 +5,7 @@ import pandas as pd
 
 from src import config
 from src.api.storage import fetch_predictions
+from src.features.build_features import engineer_features
 from src.monitoring.drift import compute_drift_report
 
 
@@ -17,7 +18,7 @@ def load_production_features(limit: int = 2000) -> pd.DataFrame:
     if not rows:
         return pd.DataFrame()
     features = [json.loads(r[1]) for r in rows]
-    return pd.DataFrame(features)
+    return engineer_features(pd.DataFrame(features))
 
 
 def run(drift_threshold: float = 0.25) -> pd.DataFrame:
@@ -30,15 +31,18 @@ def run(drift_threshold: float = 0.25) -> pd.DataFrame:
     report = compute_drift_report(reference, current, config.NUMERIC_FEATURES)
     print(report.to_string(index=False))
 
+    log_path = Path(config.ARTIFACTS_DIR) / "drift_alerts.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
     alerts = report[report["psi"] >= drift_threshold]
     if not alerts.empty:
-        log_path = Path(config.ARTIFACTS_DIR) / "drift_alerts.log"
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(log_path, "a", encoding="utf-8") as f:
-            for _, row in alerts.iterrows():
-                f.write(f"{row['feature']}\t{row['psi']:.4f}\t{row['status']}\n")
+        lines = [
+            f"{row['feature']}\t{row['psi']:.4f}\t{row['status']}" for _, row in alerts.iterrows()
+        ]
+        log_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         print(f"ALERT: {len(alerts)} features above {drift_threshold} -> {log_path}")
     else:
+        log_path.unlink(missing_ok=True)
         print(f"no drift alerts (threshold {drift_threshold})")
     return report
 

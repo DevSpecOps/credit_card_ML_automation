@@ -61,3 +61,15 @@ def test_predict_invalid_age():
     bad_payload["AGE"] = 150
     response = client.post("/predict", json=bad_payload)
     assert response.status_code == 422
+
+
+def test_predict_rejects_zero_limit_bal():
+    bad = VALID_PAYLOAD.copy()
+    bad["LIMIT_BAL"] = 0
+    assert client.post("/predict", json=bad).status_code == 422
+
+
+def test_predict_rejects_invalid_pay_0():
+    bad = VALID_PAYLOAD.copy()
+    bad["PAY_0"] = 15
+    assert client.post("/predict", json=bad).status_code == 422
