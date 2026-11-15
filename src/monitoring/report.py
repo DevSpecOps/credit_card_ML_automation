@@ -22,17 +22,19 @@ def load_production_features(limit: int = 2000) -> pd.DataFrame:
 
 
 def run(drift_threshold: float = 0.25) -> pd.DataFrame:
+    log_path = Path(config.ARTIFACTS_DIR) / "drift_alerts.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
     reference = load_reference()
     current = load_production_features()
+
     if current.empty:
         print("no production predictions to compare")
+        log_path.unlink(missing_ok=True)
         return pd.DataFrame()
 
     report = compute_drift_report(reference, current, config.NUMERIC_FEATURES)
     print(report.to_string(index=False))
-
-    log_path = Path(config.ARTIFACTS_DIR) / "drift_alerts.log"
-    log_path.parent.mkdir(parents=True, exist_ok=True)
 
     alerts = report[report["psi"] >= drift_threshold]
     if not alerts.empty:
